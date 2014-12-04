@@ -5,12 +5,12 @@ This is a RESTful server implementation for my Android app. It is written in PHP
 
 
 	User REST API Interface:  
-  GET      /users 					Gets all the users  
-  GET      /users/2					Retrieves a user based on primary key  
-	POST     /users/login 		Send a username and password and receive a message.  
-	POST     /api/users/add   Create a new user  
-	PUT      /api/users/2			Updates user based on primary key  
-	DELETE   /api/users/2			Deletes user based on primary key  
+	  GET      /users 			Gets all the users  
+	  GET      /users/2			Retrieves a user based on primary key 
+	  POST     /users/login 		Send a username and password and receive a message.  
+	  POST     /api/users/add               Create a new user  
+	  PUT      /api/users/2			Updates user based on primary key  
+	  DELETE   /api/users/2			Deletes user based on primary key  
 
 How to setup:
 ============
