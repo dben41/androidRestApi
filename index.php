@@ -2,28 +2,39 @@
 /*
 	User REST API Interface:
 
-  GET      /api/users 					Gets all the users
-  GET      /api/users/2					Retrieves all users based on primary key
+    GET      /api/users 					Gets all the users
+    *GET      /api/users/search/Bob  	    Gets all the users named Bob
+    GET      /api/users/2					Retrieves all users based on primary key
 	POST     /api/users/login 				Send a username and password and receive a message.
 	POST     /api/users/add    				Create a new user
 	*PUT      /api/users/2					Updates user based on primary key
 	*DELETE   /api/users/2					Deletes user based on primary key
 
+Public IP	54.187.247.248
+User name	Administrator
+Password	ficqWg)-ecs
 
 */
 $uid = "uid";
-$name = "name";
+$email = "email";
 $username =  "username";
 $password = "password";
+$phone = "phone";
+$class_id = "class_id";
+$name = "name";
 $role = "role";
 
 //declare user array
 $userKeys = array(
 	$uid=>0,
-	$name=>0,
+	$email=>0,
 	$username=>0,
 	$password=>0,
+	$phone => 0,
+	$class_id => 0,
+	$name=>0,
 	$role=>0
+	
 	);
 
 //parse the requested resource
@@ -118,10 +129,10 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 			//print "It's a post!!";
 			$postData = file_get_contents("php://input");
 			$user = json_decode($postData, true);
-			
+
 			//check if empty
 			if(empty($user))
-				die("User contains no data!");
+				die("User contains no ddata!");
 
 			//check to see if username is available
 			if(!login_available($user['username']))
@@ -132,17 +143,21 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 			try{
 				$DBH = openDBConnection();
 				$DBH->beginTransaction();
-				$stmt = $DBH->prepare("INSERT INTO user (name, username, password, role) VALUES(?,?,?,?);");
+				$stmt = $DBH->prepare("INSERT INTO user (name, username, password, role, class_id, phone, email) VALUES(?,?,?,?,?,?,?);");
 				$stmt->bindValue(1, $user["name"]);
 				$stmt->bindValue(2, $user["username"]);
 				$stmt->bindValue(3, $user["password"]);
 				$stmt->bindValue(4, $user["role"]);
+				$stmt->bindValue(5, $user["class_id"]);
+				$stmt->bindValue(6, $user["phone"]);
+				$stmt->bindValue(7, $user["email"]);
 				$stmt->execute();
 				$DBH->commit();
 				//return success message
 				print(json_encode("User inserted successfully!"));
 
 			}catch(PDOException $e) {
+				print_r($user);
 				die("Problem inserting into DB!");
 				reportDBError($e);
 			}
@@ -150,9 +165,11 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 		} else if ($resourceKeys[0] == "login") {
 			//set up things
 			header("Content-type: text/plain");
-			$postData = file_get_contents("php://input");
+			$postData = file_get_contents("php://input"); 
+			
 			$user = json_decode($postData, true);
 			//check if empty
+			
 			if(empty($user))
 				die("No credentials provided!");
 			//check to see if user is in DB
@@ -168,12 +185,12 @@ if($_SERVER['REQUEST_METHOD'] == "GET")
 				if($row  = $stmt-> fetch()){
 					$booleanMatch = $row["password"] == $user["password"];
 					if($booleanMatch)
-						print(json_encode("User successfully logged in!"));
+						print(json_encode("Signin successful!"));
 					else
 						print(json_encode("Invalid password!"));
 
-				} //else the username doesn't exist!
-
+				} else // the username doesn't exist!
+					print(json_encode("Invalid user!"));
 
 			}catch(PDOException $e) {
 				die("authentication error!");
